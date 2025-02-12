@@ -7,24 +7,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using Questao5.Application.Queries.Responses;
 using Questao5.Domain.Entities;
+using Questao5.Infrastructure.Interfaces;
+using Questao5.Infrastructure.Sqlite;
 
 namespace Questao5.Application.Handlers
 {
     public class ConsultarSaldoHandler : IRequestHandler<ConsultarSaldoQuery, QueryResult>
     {
-        private readonly IDbConnection _dbConnection;
+        private readonly IDatabaseHelper _databaseHelper;
 
-        public ConsultarSaldoHandler(IDbConnection dbConnection)
+
+        public ConsultarSaldoHandler(IDatabaseHelper databaseHelper)
         {
-            _dbConnection = dbConnection;
+            _databaseHelper = databaseHelper;
         }
 
         public async Task<QueryResult> Handle(ConsultarSaldoQuery request, CancellationToken cancellationToken)
         {
             // Validar conta
-            var conta = await _dbConnection.QueryFirstOrDefaultAsync<ContaCorrente>(
-                "SELECT * FROM contacorrente WHERE idcontacorrente = @IdContaCorrente",
-                new { request.IdContaCorrente });
+            var query = "SELECT * FROM contacorrente WHERE idcontacorrente = @IdContaCorrente";
+            var param = new { request.IdContaCorrente };
+            var conta = await _databaseHelper.GetContaCorrenteAsync(query, param);
 
             if (conta == null)
                 return new QueryResult { Sucesso = false, Mensagem = "Conta não cadastrada", TipoErro = "INVALID_ACCOUNT" };
@@ -32,10 +35,9 @@ namespace Questao5.Application.Handlers
             if (conta.Ativo == 0)
                 return new QueryResult { Sucesso = false, Mensagem = "Conta inativa", TipoErro = "INACTIVE_ACCOUNT" };
 
-            // Calcular saldo
-            var movimentos = await _dbConnection.QueryAsync<Movimento>(
-                "SELECT * FROM movimento WHERE idcontacorrente = @IdContaCorrente",
-                new { request.IdContaCorrente });
+            var queryMovimentos = "SELECT * FROM movimento WHERE idcontacorrente = @IdContaCorrente";
+            var movimentos = await _databaseHelper.GetMovimentosAsync(queryMovimentos, param);
+
 
             var saldo = movimentos.Where(m => m.TipoMovimento == "C").Sum(m => m.Valor) -
                         movimentos.Where(m => m.TipoMovimento == "D").Sum(m => m.Valor);

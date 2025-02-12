@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Questao1;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Questao1;
 
 namespace Exercicio.Tests
 {
@@ -12,7 +6,7 @@ namespace Exercicio.Tests
     public class ContaBancariaUnitTests
     {
         [TestMethod]
-        public void TestCriarContaSemDepositoInicial()
+        public void CriarConta_DeveCriarComSucesso_QuandoNaoHaDepositoInicial()
         {
             var conta = new ContaBancaria(1234, "João Silva");
             Assert.AreEqual(1234, conta.Numero);
@@ -21,7 +15,7 @@ namespace Exercicio.Tests
         }
 
         [TestMethod]
-        public void TestCriarContaComDepositoInicial()
+        public void CriarConta_DeveCriarComSucesso_QuandoHaDepositoInicial()
         {
             var conta = new ContaBancaria(5678, "Maria Oliveira", 500.00);
             Assert.AreEqual(5678, conta.Numero);
@@ -30,7 +24,7 @@ namespace Exercicio.Tests
         }
 
         [TestMethod]
-        public void TestDepositoIncrementaSaldo()
+        public void Deposito_DeveIncrementarSaldo_QuandoValorForPositivo()
         {
             var conta = new ContaBancaria(1234, "Carlos Pereira", 100.00);
             conta.Deposito(150.00);
@@ -38,7 +32,7 @@ namespace Exercicio.Tests
         }
 
         [TestMethod]
-        public void TestSaqueDeduzSaldoComTaxa()
+        public void Saque_DeveDeduzirSaldoComTaxa_QuandoSaldoForSuficiente()
         {
             var conta = new ContaBancaria(4321, "Ana Santos", 300.00);
             conta.Saque(100.00);
@@ -46,7 +40,7 @@ namespace Exercicio.Tests
         }
 
         [TestMethod]
-        public void TestSaqueComSaldoInsuficiente()
+        public void Saque_DevePermitirESaldoNegativo_QuandoSaldoForInsuficiente()
         {
             var conta = new ContaBancaria(9876, "Pedro Gomes", 50.00);
             conta.Saque(100.00);

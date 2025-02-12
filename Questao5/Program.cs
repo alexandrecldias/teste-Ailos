@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Data.Sqlite;
+using Questao5.Infrastructure.Interfaces;
 using Questao5.Infrastructure.Services;
 using Questao5.Infrastructure.Services.Interface;
 using Questao5.Infrastructure.Sqlite;
@@ -14,6 +15,8 @@ builder.Services.AddScoped<IDbConnection>(sp =>
     return new SqliteConnection(databaseConfig.Name);
 });
 builder.Services.AddScoped<IIdempotencyService, IdempotencyService>();
+builder.Services.AddTransient<IDatabaseHelper, DatabaseHelper>();
+
 
 
 // Add services to the container.
